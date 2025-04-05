@@ -9,7 +9,7 @@ Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(
   NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG,  
   NEO_GRB + NEO_KHZ800);
 
-const char text[] = "SHOOT DIDDY"; 
+const char text[] = "SHOOT alien"; 
 
 void setup() {
   matrix.begin();
