@@ -2,7 +2,7 @@
 #include <Adafruit_NeoMatrix.h>
 #include <Adafruit_NeoPixel.h>
 
-#define LED_PIN 6  // Pin connected to DIN
+#define LED_PIN 6   // Pin connected to DIN
 
 Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(
   32, 8, LED_PIN,  // Width, Height, Pin
@@ -10,38 +10,69 @@ Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(
   NEO_GRB + NEO_KHZ800);
 
 const char text[] = "SHOOT alien"; 
+int head = 0;
+int body = 0;
+int arms = 0;
+int legs = 0;
+int HP = 100;
 
 void setup() {
   matrix.begin();
   matrix.setTextWrap(false);
-  matrix.setBrightness(10);  // Adjust brightness (max 255)
+  matrix.setBrightness(255);  // Adjust brightness (max 255)
+
+  Serial.begin(9600);
+
+  pinMode(A0, INPUT); // head
+  pinMode(A5, INPUT); // body
+  pinMode(A2, INPUT); // arm
+  pinMode(A1, INPUT); // arm
+  pinMode(A4, INPUT); // legs 
+
+  displayHP(); // Show initial HP
+}
+
+void displayHP() {
+  matrix.fillScreen(0); // Clear screen
+  matrix.setCursor(0, 0);
+  matrix.setTextColor(matrix.Color(0, 255, 0)); // Green text
+  
+  matrix.print(HP);
+  matrix.show();
 }
 
 void loop() {
-  static int scrollX = matrix.width(); // Start text off-screen
-  static int charWidth = 6;  // Approximate width of a character in pixels
-  static int textWidth = strlen(text) * charWidth; // Calculate total text width
-
-  // Fill the entire background with white
-  for (int x = 0; x < matrix.width(); x++) {
-    for (int y = 0; y < matrix.height(); y++) {
-      matrix.drawPixel(x, y, matrix.Color(255, 255, 255)); // White background
-    }
+  head = analogRead(A0);
+  if (head) {
+    Serial.println("head");
+    HP -= 100;
+    displayHP();
+    delay(1000);
+    if (HP <= 0) {
+    delay(3000);
+    HP = 100;
+    displayHP();
+  }
   }
 
-  // Draw the scrolling text
-  matrix.setCursor(scrollX, 1);
-  matrix.setTextColor(matrix.Color(255, 20, 147)); // Pink text
-  matrix.print(text);
-  matrix.show();
-
-  // Move text left
-  scrollX--;
-
-  // Reset text position when fully scrolled out
-  if (scrollX < -textWidth) {
-    scrollX = matrix.width();
+  body = analogRead(A5);
+  if (body) {
+    Serial.println("body");
+    HP -= 50;
+    displayHP();
+    delay(1000);
+    if (HP <= 0) {
+    delay(3000);
+    HP = 100;
+    displayHP();
+  }
   }
 
-  delay(100); // Adjust speed
+
+
+  if (HP <= 0) {
+    delay(3000);
+    HP = 100;
+    displayHP();
+  }
 }
